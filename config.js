@@ -55,7 +55,7 @@ const CONFIG = {
 
   couplePhoto: "images/couple.jpeg",
   deityPhoto: "images/deity.png",
-  song: "music/song.mp3",
+  song: "music/song.mpeg",
 
   shareText: "You are warmly invited to the wedding of Chyavan & Anusha! 6 December 2026, Kolar. "
 };
