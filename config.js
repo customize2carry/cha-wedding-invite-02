@@ -57,5 +57,5 @@ const CONFIG = {
   couplePhoto: "images/couple.jpeg",
   ganeshaPhoto: "images/ganesha.png",
   venkateshPhoto: "images/venkateshwara.png",
-  song: "music/song.mp3"
+  song: "music/song.mpeg"
 };
