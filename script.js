@@ -3,6 +3,7 @@
   const $ = (s) => document.querySelector(s);
   let opened = false;
   let ganDone = false;
+  let userMuted = false;
 
   const events = C.events.map((e, i) => `
     <div class="event reveal ${i % 2 ? "right" : "left"}"><div class="card">
@@ -27,13 +28,15 @@
 
   <div id="ganesha" class="badge"><img src="${C.ganeshaPhoto}" alt="Lord Ganesha" onerror="this.parentNode.remove()"></div>
   <div id="venkatesh" class="badge"><img src="${C.venkateshPhoto}" alt="Lakshmi Venkateshwara" onerror="this.parentNode.remove()"></div>
-  <button id="music" class="hidden" aria-label="Music on or off">♪</button>
+  <button id="music" class="hidden" aria-label="Mute or unmute the song">🔊</button>
 
   <section id="hero"><div class="wrap">
     <p class="kn reveal">${C.opening}</p>
-    <div id="pframe"><div class="frame reveal zoom"><img src="${C.couplePhoto}" alt="${C.groomShort} and ${C.brideShort}" onerror="this.parentNode.remove()"></div></div>
-    <h1><span class="nm reveal left">${C.groomShort}</span><span class="heart">♥</span><span class="nm reveal right">${C.brideShort}</span></h1>
-    <p class="tagline reveal" style="transition-delay:.3s">${C.tagline}</p>
+    <div id="hgroup">
+      <div class="frame reveal zoom"><img src="${C.couplePhoto}" alt="${C.groomShort} and ${C.brideShort}" onerror="this.parentNode.remove()"></div>
+      <h1><span class="nm reveal left">${C.groomShort}</span><span class="heart">♥</span><span class="nm reveal right">${C.brideShort}</span></h1>
+      <p class="tagline reveal" style="transition-delay:.3s">${C.tagline}</p>
+    </div>
   </div></section>
 
   <section id="invite"><div class="wrap">
@@ -83,13 +86,29 @@
 
   /* music */
   const audio = new Audio(C.song);
-  audio.loop = true; audio.volume = 0.5;
+  audio.loop = true;
+  audio.volume = 0.6;
+  audio.preload = "auto";
   const music = $("#music");
-  audio.addEventListener("error", () => music.remove());
+
+  function setIcon() {
+    music.textContent = audio.paused ? "🔇" : "🔊";
+    music.classList.toggle("on", !audio.paused);
+  }
+  audio.addEventListener("play", setIcon);
+  audio.addEventListener("pause", setIcon);
+  audio.addEventListener("error", () => console.log("Song not found. Check the file name:", C.song));
+
   music.onclick = () => {
-    if (audio.paused) { audio.play(); music.classList.add("on"); }
-    else { audio.pause(); music.classList.remove("on"); }
+    if (audio.paused) { userMuted = false; audio.play().catch(() => {}); }
+    else { userMuted = true; audio.pause(); }
   };
+
+  // if the browser blocked the first play, try again on the first touch or scroll
+  function retryPlay() {
+    if (opened && !userMuted && audio.paused) audio.play().catch(() => {});
+  }
+  ["touchstart", "click", "scroll"].forEach(ev => addEventListener(ev, retryPlay, { passive: true }));
 
   /* contact: numbers appear only after tapping */
   $("#callBtn").onclick = () => {
@@ -101,7 +120,7 @@
   };
 
   /* helpers */
-  const gan = $("#ganesha"), ven = $("#venkatesh"), pf = $("#pframe");
+  const gan = $("#ganesha"), ven = $("#venkatesh"), hg = $("#hgroup");
   const tl = $(".timeline"), fill = $(".tl-fill"), bar = $("#bar");
   const vwNow = () => document.documentElement.clientWidth;
   const margin = () => (vwNow() > 700 ? 20 : 12);
@@ -120,10 +139,8 @@
     const p = Math.min(sy / 240, 1);
     const m = margin();
 
-    // Ganesha stays in the top-left corner once the opening move is done
     if (gan && gan.isConnected && ganDone) gan.style.transform = ganCorner();
 
-    // Venkateshwara: top centre first, then moves to the top-right corner on scroll
     if (ven && ven.isConnected) {
       const big = ven.offsetWidth;
       const small = smallSize();
@@ -137,7 +154,8 @@
     const max = document.documentElement.scrollHeight - vh;
     bar.style.width = (max > 0 ? (sy / max) * 100 : 0) + "%";
 
-    if (pf && sy < vh * 1.5) pf.style.transform = `translateY(${sy * 0.15}px)`;
+    // photo, names and tagline move together as one group
+    if (hg && sy < vh * 1.5) hg.style.transform = `translateY(${Math.min(sy * 0.1, 50)}px)`;
 
     const r = tl.getBoundingClientRect();
     const pr = Math.max(0, Math.min(1, (vh * 0.65 - r.top) / r.height));
@@ -155,7 +173,7 @@
   addEventListener("resize", onScroll);
   update();
 
-  /* reveal on scroll (animates in and out as you swipe) */
+  /* reveal on scroll */
   function startReveals() {
     const io = new IntersectionObserver(
       (es) => es.forEach(e => e.target.classList.toggle("in", e.isIntersecting)),
@@ -164,12 +182,14 @@
     document.querySelectorAll(".reveal, .line").forEach(el => io.observe(el));
   }
 
-  /* open: Ganesha flies from the middle to the top-left corner,
-     Venkateshwara appears at the top centre */
+  /* open: song starts, Ganesha flies to the top-left, Venkateshwara appears */
   $("#openBtn").onclick = () => {
     opened = true;
-    const cg = $(".cover-gan");
+    audio.play().catch(() => {});   // starts the song right on the tap
+    music.classList.remove("hidden");
+    setIcon();
 
+    const cg = $(".cover-gan");
     if (gan && gan.isConnected) {
       if (cg) {
         const r = cg.getBoundingClientRect();
@@ -178,7 +198,7 @@
         gan.style.transform = `translate(${r.left}px,${r.top}px) scale(${r.width / big})`;
         gan.style.opacity = 1;
         cg.style.visibility = "hidden";
-        void gan.offsetWidth; // force reflow so the move animates
+        void gan.offsetWidth;
         gan.style.transition = "transform 1.2s cubic-bezier(.65,0,.25,1)";
         gan.style.transform = ganCorner();
         setTimeout(() => { gan.style.transition = "none"; ganDone = true; update(); }, 1300);
@@ -190,8 +210,6 @@
 
     $("#cover").classList.add("hide");
     document.body.classList.remove("locked");
-    music.classList.remove("hidden");
-    audio.play().then(() => music.classList.add("on")).catch(() => {});
     update();
     setTimeout(startReveals, 300);
     setTimeout(() => $("#cover").remove(), 1000);
