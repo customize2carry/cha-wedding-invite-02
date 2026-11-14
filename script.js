@@ -40,8 +40,8 @@
   <section id="family"><div class="wrap">
     <h2 class="reveal">The Families</h2><div class="line"></div>
     <div class="grid">
-      <div class="card reveal"><p class="small">Groom</p><h3>${C.groomName}</h3><p>Beloved son of<br><b>${C.groomParents}</b></p></div>
-      <div class="card reveal"><p class="small">Bride</p><h3>${C.brideName}</h3><p>Beloved daughter of<br><b>${C.brideParents}</b></p></div>
+      <div class="card reveal"><p class="small"> </p><h3>${C.groomName}</h3><p>Beloved son of<br><b>${C.groomParents}</b></p></div>
+      <div class="card reveal"><p class="small"> </p><h3>${C.brideName}</h3><p>Beloved daughter of<br><b>${C.brideParents}</b></p></div>
     </div>
   </div></section>
 
