@@ -1,35 +1,38 @@
 (function () {
   const C = CONFIG;
   const $ = (s) => document.querySelector(s);
+  let opened = false;
 
-  const events = C.events.map(e => `
-    <div class="event reveal"><div class="card">
+  const events = C.events.map((e, i) => `
+    <div class="event reveal ${i % 2 ? "right" : "left"}"><div class="card">
       <h3>${e.name}</h3>
       <p class="date">${e.date}</p><p>${e.time}</p>
       <p class="venue">${e.venue}</p><p class="addr">${e.address}</p>
       <a class="btn fill" href="${e.map}" target="_blank" rel="noopener">Get Directions</a>
     </div></div>`).join("");
 
-  const paras = (arr) => arr.map(t => `<p class="txt reveal">${t}</p>`).join("");
-  const calls = C.contacts.map(c => `<a class="btn" href="tel:${c.number}">📞 ${c.number}</a>`).join("");
+  const paras = (arr) => arr.map((t, i) => `<p class="txt reveal" style="transition-delay:${i * 0.15}s">${t}</p>`).join("");
 
   $("#app").innerHTML = `
+  <div id="bar"></div>
+
   <div id="cover"><div class="cover-arch">
+    <img class="cover-gan" src="${C.ganeshaPhoto}" alt="Lord Ganesha" onerror="this.remove()">
     <p class="kn">${C.opening}</p>
     <h1>${C.groomShort}<span class="heart">♥</span>${C.brideShort}</h1>
     <p class="small">Wedding Invitation</p>
-    <button id="openBtn" class="btn fill">Open Invitation</button>
+    <button id="openBtn" class="btn fill pulse">Open Invitation</button>
   </div></div>
 
-  <div id="deity" class="hidden"><img src="${C.deityPhoto}" alt="Lord Ganesha and Lakshmi Venkateshwara" onerror="this.parentNode.remove()"></div>
-  <div id="lightbox"><img src="${C.deityPhoto}" alt=""></div>
+  <div id="ganesha" class="badge"><img src="${C.ganeshaPhoto}" alt="Lord Ganesha" onerror="this.parentNode.remove()"></div>
+  <div id="venkatesh" class="badge"><img src="${C.venkateshPhoto}" alt="Lakshmi Venkateshwara" onerror="this.parentNode.remove()"></div>
   <button id="music" class="hidden" aria-label="Music on or off">♪</button>
 
   <section id="hero"><div class="wrap">
     <p class="kn reveal">${C.opening}</p>
-    <div class="frame reveal"><img src="${C.couplePhoto}" alt="${C.groomShort} and ${C.brideShort}" onerror="this.parentNode.remove()"></div>
-    <h1 class="reveal">${C.groomShort} <span class="heart">♥</span> ${C.brideShort}</h1>
-    <p class="tagline reveal">${C.tagline}</p>
+    <div id="pframe"><div class="frame reveal zoom"><img src="${C.couplePhoto}" alt="${C.groomShort} and ${C.brideShort}" onerror="this.parentNode.remove()"></div></div>
+    <h1><span class="nm reveal left">${C.groomShort}</span><span class="heart">♥</span><span class="nm reveal right">${C.brideShort}</span></h1>
+    <p class="tagline reveal" style="transition-delay:.3s">${C.tagline}</p>
   </div></section>
 
   <section id="invite"><div class="wrap">
@@ -40,27 +43,42 @@
   <section id="family"><div class="wrap">
     <h2 class="reveal">The Families</h2><div class="line"></div>
     <div class="grid">
-      <div class="card reveal"><p class="small"> </p><h3>${C.groomName}</h3><p>Beloved son of<br><b>${C.groomParents}</b></p></div>
-      <div class="card reveal"><p class="small"> </p><h3>${C.brideName}</h3><p>Beloved daughter of<br><b>${C.brideParents}</b></p></div>
+      <div class="card reveal left"><h3>${C.groomName}</h3><p>Beloved son of<br><b>${C.groomParents}</b></p></div>
+      <div class="card reveal right"><h3>${C.brideName}</h3><p>Beloved daughter of<br><b>${C.brideParents}</b></p></div>
     </div>
   </div></section>
 
   <section id="events"><div class="wrap">
     <h2 class="reveal">The Wedding Celebrations</h2><div class="line"></div>
     <p class="small reveal">${C.countdownLabel}</p>
-    <div class="countdown reveal" id="cd"></div>
-    <div class="timeline">${events}</div>
+    <div class="countdown reveal zoom" id="cd"></div>
+    <div class="timeline"><div class="tl-fill"></div>${events}</div>
   </div></section>
 
   <section id="closing"><div class="wrap">
     <h2 class="reveal">With Love &amp; Warm Regards</h2><div class="line"></div>
     ${paras(C.closing)}
-    <p class="sign reveal">${C.signoff}</p>
-    <div class="reveal">${calls}
-      <a class="btn fill" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(C.shareText + location.href)}">Share on WhatsApp</a>
+    <p class="sign reveal zoom">${C.signoff}</p>
+    <div class="reveal">
+      <button id="callBtn" class="btn fill">Contact Us</button>
+      <div id="nums" class="nums"></div>
     </div>
-    <p class="foot">॥ ಶುಭಂ ಭವತು ॥</p>
+    <p class="foot">♥</p>
   </div></section>`;
+
+  /* petals over the whole page */
+  const pet = document.createElement("div");
+  pet.id = "petals";
+  document.body.appendChild(pet);
+  for (let i = 0; i < 16; i++) {
+    const p = document.createElement("span");
+    p.className = "petal";
+    p.style.left = Math.random() * 100 + "%";
+    p.style.animationDuration = 9 + Math.random() * 7 + "s";
+    p.style.animationDelay = Math.random() * 10 + "s";
+    p.style.width = p.style.height = 9 + Math.random() * 8 + "px";
+    pet.appendChild(p);
+  }
 
   /* music */
   const audio = new Audio(C.song);
@@ -72,19 +90,82 @@
     else { audio.pause(); music.classList.remove("on"); }
   };
 
-  /* open */
-  $("#openBtn").onclick = () => {
-    $("#cover").classList.add("hide");
-    document.body.classList.remove("locked");
-    $("#deity").classList.remove("hidden");
-    music.classList.remove("hidden");
-    audio.play().then(() => music.classList.add("on")).catch(() => {});
-    setTimeout(() => $("#cover").remove(), 1000);
+  /* contact: numbers appear only after tapping */
+  $("#callBtn").onclick = () => {
+    const box = $("#nums");
+    if (!box.innerHTML) {
+      box.innerHTML = C.contacts.map(c => `<a class="btn" href="tel:${c.number}">📞 ${c.number}</a>`).join("");
+    }
+    box.classList.toggle("show");
   };
 
-  /* deity zoom */
-  $("#deity").onclick = () => $("#lightbox").classList.add("show");
-  $("#lightbox").onclick = () => $("#lightbox").classList.remove("show");
+  /* scroll-driven movement */
+  const gan = $("#ganesha"), ven = $("#venkatesh"), pf = $("#pframe");
+  const tl = $(".timeline"), fill = $(".tl-fill"), bar = $("#bar");
+
+  function update() {
+    const sy = window.scrollY || 0;
+    const vw = document.documentElement.clientWidth;
+    const vh = window.innerHeight;
+    const p = Math.min(sy / 240, 1);
+    const m = vw > 700 ? 20 : 12;
+
+    if (gan && gan.isConnected) {
+      const big = gan.offsetWidth;
+      const small = ven && ven.isConnected ? ven.offsetWidth : big * 0.5;
+      const k = 1 - (1 - small / big) * p;
+      const x = (1 - p) * (vw / 2 - big / 2) + p * m;
+      const y = (1 - p) * 14 + p * m;
+      gan.style.transform = `translate(${x}px,${y}px) scale(${k})`;
+      gan.style.opacity = opened ? 1 : 0;
+    }
+    if (ven && ven.isConnected) {
+      const small = ven.offsetWidth;
+      ven.style.opacity = opened ? p : 0;
+      ven.style.transform = `translate(${vw - small - m + (1 - p) * 60}px,${m}px)`;
+    }
+
+    const max = document.documentElement.scrollHeight - vh;
+    bar.style.width = (max > 0 ? (sy / max) * 100 : 0) + "%";
+
+    if (pf && sy < vh * 1.5) pf.style.transform = `translateY(${sy * 0.15}px)`;
+
+    const r = tl.getBoundingClientRect();
+    const pr = Math.max(0, Math.min(1, (vh * 0.65 - r.top) / r.height));
+    fill.style.transform = `scaleY(${pr})`;
+    document.querySelectorAll(".event").forEach(ev =>
+      ev.classList.toggle("active", ev.getBoundingClientRect().top < vh * 0.65));
+  }
+  let busy = false;
+  function onScroll() {
+    if (busy) return;
+    busy = true;
+    requestAnimationFrame(() => { update(); busy = false; });
+  }
+  addEventListener("scroll", onScroll, { passive: true });
+  addEventListener("resize", onScroll);
+  update();
+
+  /* reveal on scroll (animates in and out as you swipe) */
+  function startReveals() {
+    const io = new IntersectionObserver(
+      (es) => es.forEach(e => e.target.classList.toggle("in", e.isIntersecting)),
+      { threshold: 0.2, rootMargin: "0px 0px -6% 0px" }
+    );
+    document.querySelectorAll(".reveal, .line").forEach(el => io.observe(el));
+  }
+
+  /* open: the only tap needed (it also starts the song) */
+  $("#openBtn").onclick = () => {
+    opened = true;
+    $("#cover").classList.add("hide");
+    document.body.classList.remove("locked");
+    music.classList.remove("hidden");
+    audio.play().then(() => music.classList.add("on")).catch(() => {});
+    update();
+    setTimeout(startReveals, 300);
+    setTimeout(() => $("#cover").remove(), 1000);
+  };
 
   /* countdown */
   function tick() {
@@ -95,21 +176,4 @@
     $("#cd").innerHTML = v.map((n, i) => `<div class="cd"><b>${n}</b><span>${l[i]}</span></div>`).join("");
   }
   tick(); setInterval(tick, 1000);
-
-  /* petals */
-  for (let i = 0; i < 14; i++) {
-    const p = document.createElement("span");
-    p.className = "petal";
-    p.style.left = Math.random() * 100 + "%";
-    p.style.animationDuration = 8 + Math.random() * 6 + "s";
-    p.style.animationDelay = Math.random() * 10 + "s";
-    p.style.transform = `scale(${0.7 + Math.random() * 0.8})`;
-    $("#hero").appendChild(p);
-  }
-
-  /* scroll reveal */
-  const io = new IntersectionObserver((es) => es.forEach(e => {
-    if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-  }), { threshold: 0.15 });
-  document.querySelectorAll(".reveal").forEach(el => io.observe(el));
 })();
