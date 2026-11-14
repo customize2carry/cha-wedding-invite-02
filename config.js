@@ -13,8 +13,9 @@ const CONFIG = {
   groomParents: "Manjunath UH & Uma HN",
   brideParents: "C Gowrishankar Dixith & Mamatha US",
 
-  countdownTo: "2026-12-06T08:15:00+05:30",
-  countdownLabel: "Counting down to the muhurtham",
+  // Countdown target. Change T20:30:00 to T08:30:00 if you meant 8:30 AM
+  countdownTo: "2026-12-06T20:30:00+05:30",
+  countdownLabel: "Counting down to our big day",
 
   events: [
     {
@@ -54,8 +55,7 @@ const CONFIG = {
   ],
 
   couplePhoto: "images/couple.jpeg",
-  deityPhoto: "images/deity.png",
-  song: "music/song.mpeg",
-
-  shareText: "You are warmly invited to the wedding of Chyavan & Anusha! 6 December 2026, Kolar. "
+  ganeshaPhoto: "images/ganesha.png",
+  venkateshPhoto: "images/venkateshwara.png",
+  song: "music/song.mp3"
 };
