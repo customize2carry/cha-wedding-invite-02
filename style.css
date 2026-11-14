@@ -48,7 +48,7 @@ h2{font-size:2.1rem;margin-bottom:8px}
 @keyframes glow{0%,100%{box-shadow:0 0 6px rgba(184,146,58,.5)}50%{box-shadow:0 0 18px rgba(232,147,44,.85)}}
 
 /* music */
-#music{position:fixed;left:14px;bottom:16px;z-index:120;width:46px;height:46px;border-radius:50%;border:1px solid var(--gold);background:#fff;color:var(--maroon);font-size:1.2rem;cursor:pointer;transition:opacity .8s}
+#music{position:fixed;right:14px;bottom:16px;z-index:120;width:46px;height:46px;border-radius:50%;border:1px solid var(--gold);background:#fff;color:var(--maroon);font-size:1.2rem;cursor:pointer;transition:opacity .8s}
 #music.on{animation:ring 1.8s infinite}
 @keyframes ring{0%{box-shadow:0 0 0 0 rgba(184,146,58,.6)}100%{box-shadow:0 0 0 14px rgba(184,146,58,0)}}
 .hidden{opacity:0;pointer-events:none}
