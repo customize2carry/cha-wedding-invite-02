@@ -14,7 +14,7 @@ const CONFIG = {
   brideParents: "C Gowrishankar Dixith & Mamatha US",
 
   // Countdown target. Change T20:30:00 to T08:30:00 if you meant 8:30 AM
-  countdownTo: "2026-12-06T20:30:00+05:30",
+  countdownTo: "2026-12-06T08:30:00+05:30",
   countdownLabel: "Counting down to our big day",
 
   events: [
