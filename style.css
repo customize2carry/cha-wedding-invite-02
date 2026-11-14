@@ -24,7 +24,7 @@ h2{font-size:2.1rem;margin-bottom:8px}
 .btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(184,146,58,.35)}
 
 /* progress bar */
-#bar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--gold),var(--marigold));z-index:70}
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--gold),var(--marigold));z-index:130}
 
 /* cover */
 #cover{position:fixed;inset:0;z-index:100;background:radial-gradient(circle at 50% 30%,#fffaf0,#f1e2c4);display:flex;align-items:center;justify-content:center;transition:opacity .9s,visibility .9s}
@@ -32,23 +32,23 @@ h2{font-size:2.1rem;margin-bottom:8px}
 .cover-arch{width:min(340px,88vw);padding:44px 24px 40px;border:2px solid var(--gold);border-radius:200px 200px 14px 14px;text-align:center;box-shadow:0 0 0 7px #fbf1db,0 0 0 8px var(--gold);animation:rise 1s both,archGlow 3s 1s infinite}
 .cover-arch h1{font-size:2.5rem;margin:6px 0 10px;line-height:1.15}
 .cover-arch .small{margin-bottom:24px}
-.cover-gan{width:104px;height:104px;border-radius:50%;border:2px solid var(--gold);object-fit:cover;background:#fff;display:block;margin:0 auto 14px;animation:glow 3s infinite}
+.cover-gan{width:120px;height:120px;border-radius:50%;border:2px solid var(--gold);object-fit:cover;background:#fff;display:block;margin:0 auto 14px;animation:glow 3s infinite}
 .pulse{animation:ring 1.8s infinite}
 @keyframes rise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
 @keyframes archGlow{0%,100%{box-shadow:0 0 0 7px #fbf1db,0 0 0 8px var(--gold),0 0 12px rgba(184,146,58,.3)}50%{box-shadow:0 0 0 7px #fbf1db,0 0 0 8px var(--gold),0 0 34px rgba(232,147,44,.55)}}
 .heart{color:var(--marigold);display:inline-block;margin:0 8px;animation:beat 1.6s infinite}
 @keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
 
-/* corner badges (moved by scrolling) */
-.badge{position:fixed;top:0;left:0;z-index:60;border-radius:50%;border:3px solid var(--gold);background:#fff;overflow:hidden;animation:glow 3s infinite;pointer-events:none;opacity:0;transform-origin:0 0}
+/* corner badges (moved by script.js) */
+.badge{position:fixed;top:0;left:0;z-index:110;border-radius:50%;border:3px solid var(--gold);background:#fff;overflow:hidden;animation:glow 3s infinite;pointer-events:none;opacity:0;transform-origin:0 0}
 .badge img{width:100%;height:100%;object-fit:cover;display:block}
-#ganesha{width:120px;height:120px;transition:opacity .8s}
-#venkatesh{width:62px;height:62px;border-width:2px}
-@media(min-width:700px){#ganesha{width:150px;height:150px}#venkatesh{width:84px;height:84px}}
+#ganesha{width:120px;height:120px}
+#venkatesh{width:120px;height:120px;transition:opacity .9s ease .5s}
+@media(min-width:700px){#ganesha{width:150px;height:150px}#venkatesh{width:150px;height:150px}}
 @keyframes glow{0%,100%{box-shadow:0 0 6px rgba(184,146,58,.5)}50%{box-shadow:0 0 18px rgba(232,147,44,.85)}}
 
 /* music */
-#music{position:fixed;left:14px;bottom:16px;z-index:60;width:46px;height:46px;border-radius:50%;border:1px solid var(--gold);background:#fff;color:var(--maroon);font-size:1.2rem;cursor:pointer;transition:opacity .8s}
+#music{position:fixed;left:14px;bottom:16px;z-index:120;width:46px;height:46px;border-radius:50%;border:1px solid var(--gold);background:#fff;color:var(--maroon);font-size:1.2rem;cursor:pointer;transition:opacity .8s}
 #music.on{animation:ring 1.8s infinite}
 @keyframes ring{0%{box-shadow:0 0 0 0 rgba(184,146,58,.6)}100%{box-shadow:0 0 0 14px rgba(184,146,58,0)}}
 .hidden{opacity:0;pointer-events:none}
