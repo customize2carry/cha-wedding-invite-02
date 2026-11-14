@@ -2,6 +2,7 @@
   const C = CONFIG;
   const $ = (s) => document.querySelector(s);
   let opened = false;
+  let ganDone = false;
 
   const events = C.events.map((e, i) => `
     <div class="event reveal ${i % 2 ? "right" : "left"}"><div class="card">
@@ -99,30 +100,38 @@
     box.classList.toggle("show");
   };
 
-  /* scroll-driven movement */
+  /* helpers */
   const gan = $("#ganesha"), ven = $("#venkatesh"), pf = $("#pframe");
   const tl = $(".timeline"), fill = $(".tl-fill"), bar = $("#bar");
+  const vwNow = () => document.documentElement.clientWidth;
+  const margin = () => (vwNow() > 700 ? 20 : 12);
+  const smallSize = () => (vwNow() > 700 ? 84 : 62);
 
+  function ganCorner() {
+    const big = gan.offsetWidth;
+    return `translate(${margin()}px,${margin()}px) scale(${smallSize() / big})`;
+  }
+
+  /* scroll-driven movement */
   function update() {
     const sy = window.scrollY || 0;
-    const vw = document.documentElement.clientWidth;
+    const vw = vwNow();
     const vh = window.innerHeight;
     const p = Math.min(sy / 240, 1);
-    const m = vw > 700 ? 20 : 12;
+    const m = margin();
 
-    if (gan && gan.isConnected) {
-      const big = gan.offsetWidth;
-      const small = ven && ven.isConnected ? ven.offsetWidth : big * 0.5;
-      const k = 1 - (1 - small / big) * p;
-      const x = (1 - p) * (vw / 2 - big / 2) + p * m;
-      const y = (1 - p) * 14 + p * m;
-      gan.style.transform = `translate(${x}px,${y}px) scale(${k})`;
-      gan.style.opacity = opened ? 1 : 0;
-    }
+    // Ganesha stays in the top-left corner once the opening move is done
+    if (gan && gan.isConnected && ganDone) gan.style.transform = ganCorner();
+
+    // Venkateshwara: top centre first, then moves to the top-right corner on scroll
     if (ven && ven.isConnected) {
-      const small = ven.offsetWidth;
-      ven.style.opacity = opened ? p : 0;
-      ven.style.transform = `translate(${vw - small - m + (1 - p) * 60}px,${m}px)`;
+      const big = ven.offsetWidth;
+      const small = smallSize();
+      const k = 1 - (1 - small / big) * p;
+      const x = (1 - p) * (vw / 2 - big / 2) + p * (vw - small - m);
+      const y = (1 - p) * 14 + p * m;
+      ven.style.transform = `translate(${x}px,${y}px) scale(${k})`;
+      ven.style.opacity = opened ? 1 : 0;
     }
 
     const max = document.documentElement.scrollHeight - vh;
@@ -155,9 +164,30 @@
     document.querySelectorAll(".reveal, .line").forEach(el => io.observe(el));
   }
 
-  /* open: the only tap needed (it also starts the song) */
+  /* open: Ganesha flies from the middle to the top-left corner,
+     Venkateshwara appears at the top centre */
   $("#openBtn").onclick = () => {
     opened = true;
+    const cg = $(".cover-gan");
+
+    if (gan && gan.isConnected) {
+      if (cg) {
+        const r = cg.getBoundingClientRect();
+        const big = gan.offsetWidth;
+        gan.style.transition = "none";
+        gan.style.transform = `translate(${r.left}px,${r.top}px) scale(${r.width / big})`;
+        gan.style.opacity = 1;
+        cg.style.visibility = "hidden";
+        void gan.offsetWidth; // force reflow so the move animates
+        gan.style.transition = "transform 1.2s cubic-bezier(.65,0,.25,1)";
+        gan.style.transform = ganCorner();
+        setTimeout(() => { gan.style.transition = "none"; ganDone = true; update(); }, 1300);
+      } else {
+        gan.style.opacity = 1;
+        ganDone = true;
+      }
+    }
+
     $("#cover").classList.add("hide");
     document.body.classList.remove("locked");
     music.classList.remove("hidden");
